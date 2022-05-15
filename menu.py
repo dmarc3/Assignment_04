@@ -7,6 +7,7 @@ Marcus incorporated all changes to user_status.py code.
 import sys
 import logging
 from datetime import datetime
+import peewee as pw
 import main
 
 # Build logger
@@ -22,6 +23,7 @@ logger.addHandler(file_handler)
 # Add launch statement
 logger.info('Session launched at %s.', datetime.today().strftime(':%H:%M:%S'))
 
+# User
 
 def load_users():
     '''
@@ -29,14 +31,6 @@ def load_users():
     '''
     filename = input('Enter filename of user file: ')
     main.load_users(filename, user_collection)
-
-
-def load_status_updates():
-    '''
-    Loads status updates from a file
-    '''
-    filename = input('Enter filename for status file: ')
-    main.load_status_updates(filename, status_collection)
 
 
 def add_user():
@@ -97,6 +91,16 @@ def delete_user():
         logging.info("User was successfully deleted")
 
 
+# Status
+
+def load_status_updates():
+    '''
+    Loads status updates from a file
+    '''
+    filename = input('Enter filename for status file: ')
+    main.load_status_updates(filename, status_collection)
+
+
 def add_status():
     '''
     Adds a new status into the database
@@ -148,6 +152,53 @@ def delete_status():
         logging.info("Status was successfully deleted")
 
 
+def status_generator(query: pw.ModelSelect):
+    '''
+    Status generator to return current status from query.
+
+    StopIteration not needed here.
+    '''
+    for status in query:
+        yield status
+
+
+def search_all_status_updates():
+    '''
+    Ask for user_id, report how many status' were found and
+    ask user if they'd like to print each one
+    '''
+    user_id = input('Enter user ID to find status for: ')
+    query = main.search_all_status_updates(user_id, status_collection)
+    # If successful query, build and loop through generator
+    if query:
+        status_gen = status_generator(query)
+        for status in status_gen:
+            # Ask user for yes or no
+            question = 'Would you like to see the next status? (Y/N): '
+            ans = input(question)
+            while not validate_yes_no(ans):
+                ans = input(question)
+            # Interpret answer
+            if ans.lower() == 'y':
+                print(status.status_text)
+            else:
+                logging.info('Exiting search_all_status_updates.')
+                return
+        logging.info('You have reached the last status.')
+
+
+# General
+
+def validate_yes_no(ans: str) -> bool:
+    '''
+    Validates a yes or no response.
+    '''
+    if ans.lower() == 'y' or ans.lower() == 'n':
+        return True
+    print('Please enter a valid response.')
+    input('Press any key to continue...')
+    return False
+
 def quit_program():
     '''
     Quits program
@@ -155,6 +206,8 @@ def quit_program():
     logging.info('Quitting program.')
     sys.exit()
 
+
+# Main
 
 if __name__ == '__main__':
     user_collection = main.init_user_collection()
@@ -170,7 +223,8 @@ if __name__ == '__main__':
         'H': update_status,
         'I': search_status,
         'J': delete_status,
-        'K': quit_program
+        'K': search_all_status_updates,
+        'L': quit_program
     }
     while True:
         user_selection = input("""
@@ -184,7 +238,8 @@ if __name__ == '__main__':
                             H: Update status
                             I: Search status
                             J: Delete status
-                            K: Quit
+                            K: Search user's status
+                            L: Quit
 
                             Please enter your choice: """)
         user_selection = user_selection.upper().strip()

@@ -26,7 +26,7 @@ class UserStatusCollection():
         logging.info('UserStatusCollection initialized.')
         self.database = sm.Status
 
-    def add_status(self, status_id, user_id, status_text):
+    def add_status(self, status_id: str, user_id: str, status_text: str) -> bool:
         '''
         add a new status message to the collection
         '''
@@ -41,7 +41,7 @@ class UserStatusCollection():
             logging.error('Unable to add %s.', status_id)
             return False
 
-    def modify_status(self, status_id, user_id, status_text):
+    def modify_status(self, status_id: str, user_id: str, status_text: str) -> bool:
         '''
         Modifies a status message
         '''
@@ -55,7 +55,7 @@ class UserStatusCollection():
             logging.error('Unable to modify %s.', status_id)
             return False
 
-    def delete_status(self, status_id):
+    def delete_status(self, status_id: str) -> bool:
         '''
         deletes the status message with id, status_id
         '''
@@ -68,7 +68,7 @@ class UserStatusCollection():
             logging.error('Unable to delete %s.', status_id)
             return False
 
-    def search_status(self, status_id):
+    def search_status(self, status_id: str):
         '''
         Find and return a status message by its status_id
 
@@ -81,3 +81,15 @@ class UserStatusCollection():
         except self.database.DoesNotExist:
             logging.error('Unable to find %s.', status_id)
             return None
+
+    def search_all_status_updates(self, user_id: str):
+        '''
+        Given user_id, return all status updates for that user.
+        Return None if user_id not found.
+        '''
+        query = self.database.select().where(sm.Status.user_id == user_id)
+        if len(query) == 0:
+            logging.error('Unable to find %s.', user_id)
+            return None
+        logging.info("Found %i status' for %s.", len(query), user_id)
+        return query

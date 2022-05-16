@@ -137,6 +137,47 @@ def search_status():
         logging.info("Status text: %s", result.status_text)
 
 
+def filter_status_by_string():
+    '''
+    Filters statuses by phrases
+    '''
+    search_word = input('Enter the string to search: ')
+    result = main.filter_status_by_string(search_word, status_collection)
+    try:
+        while True:
+            next_result = next(result)
+            print(next_result.status_text)
+            yn_delete = input('Delete the status? (Y/N): ')
+            if yn_delete.lower().strip() == 'y':
+                delete_status(next_result.status_id, status_collection)
+            else:
+                yn_review = input('Review the next status? (Y/N): ')
+                if yn_review.lower().strip() == 'y':
+                    print(next(result).status_text)
+                else:
+                    break
+    except StopIteration:
+        logging.info('No more statuses with the following phrase %s', search_word)
+
+
+def search_all_status_updates_matching_a_string():
+    '''
+    Filters statuses by phrase
+    '''
+    search_word = input('Enter the string to search: ')
+    result = main.filter_status_by_string(search_word, status_collection)
+    for x in result:
+        print(x.status_text)
+
+
+def flagged_status_updates():
+    search_word = input('Enter the string to search: ')
+    result = main.filter_status_by_string(search_word, status_collection)
+    tuple_list = [(x.status_id, x.user_id, x.status_text) for x in result]
+    for x in tuple_list:
+        print(x)
+
+
 def delete_status():
     '''
     Deletes status from the database
@@ -169,8 +210,11 @@ if __name__ == '__main__':
         'G': add_status,
         'H': update_status,
         'I': search_status,
-        'J': delete_status,
-        'K': quit_program
+        'J': filter_status_by_string,
+        'K': search_all_status_updates_matching_a_string,
+        'L': flagged_status_updates,
+        'M': delete_status,
+        'N': quit_program
     }
     while True:
         user_selection = input("""
@@ -183,8 +227,11 @@ if __name__ == '__main__':
                             G: Add status
                             H: Update status
                             I: Search status
-                            J: Delete status
-                            K: Quit
+                            J: Search status by phrase
+                            K: Search all status updates matching a string
+                            L: Search status by phrase as tuple
+                            M: Delete status
+                            N: Quit
 
                             Please enter your choice: """)
         user_selection = user_selection.upper().strip()

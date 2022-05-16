@@ -81,3 +81,13 @@ class UserStatusCollection():
         except self.database.DoesNotExist:
             logging.error('Unable to find %s.', status_id)
             return None
+
+    def filter_status_by_string(self, search_word):
+        '''
+        Find and return status messages that contain a certain phrase
+        '''
+        try:
+            status = self.database.select().where(self.database.status_text.contains(search_word)).iterator()
+            return status
+        except self.database.DoesNotExist:
+            logging.error('Unable to find %s', search_word)

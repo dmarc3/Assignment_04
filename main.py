@@ -190,7 +190,17 @@ def search_status(status_id, status_collection):
         return result
     return None
 
+
+def filter_status_by_string(search_word, status_collection):
+    '''
+    Searches statuses that contains the search word
+    '''
+    result = status_collection.filter_status_by_string(search_word)
+    return result
+
+
 # New functions
+
 
 def load_collection(filename, keys, collection):
     '''
@@ -243,6 +253,7 @@ def load_collection(filename, keys, collection):
         logging.error('File does not exist: %s', filename)
         return False
 
+
 def validate_user_id(user_id):
     '''
     Validates user_id
@@ -257,6 +268,7 @@ def validate_user_id(user_id):
     except ValueError:
         return True
 
+
 def validate_email(email):
     '''
     Validates email
@@ -268,6 +280,7 @@ def validate_email(email):
         return False
     return True
 
+
 def validate_name(name):
     '''
     Validates user_name
@@ -278,6 +291,7 @@ def validate_name(name):
     if not name.isalpha():
         return False
     return True
+
 
 def validate_status_id(status_id):
     '''
@@ -298,6 +312,7 @@ def validate_status_id(status_id):
     except ValueError:
         return False
 
+
 def validate_status_text(status_text):
     '''
     Accept any text input
@@ -305,6 +320,7 @@ def validate_status_text(status_text):
     if isinstance(status_text, str):
         return True
     return False
+
 
 def validate_user_inputs(user_id, email, user_name, user_last_name):
     '''
@@ -325,6 +341,7 @@ def validate_user_inputs(user_id, email, user_name, user_last_name):
         return False
     return True
 
+
 def validate_status_inputs(status_id, user_id, status_text):
     '''
     Validates all status inputs
@@ -340,3 +357,4 @@ def validate_status_inputs(status_id, user_id, status_text):
         logging.error('Invalid status_text: %s', status_text)
         return False
     return True
+

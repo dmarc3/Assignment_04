@@ -98,12 +98,18 @@ class TestUserStatus(unittest.TestCase):
         self.assertEqual('test status', status.status_text)
         self.assertEqual('test123', status.user.user_id)
 
+    def test_search_phrase(self):
+        self.status_collection.add_status('test123_00002', 'test123', 'status')
+        self.status_collection.add_status('test123_00003', 'test123', 'testing status')
+        self.status_collection.filter_status_by_string('test')
+
     def tearDown(self):
         '''
         Remove all tables at end of each test and close db.
         '''
         test_db.drop_tables(MODELS)
         test_db.close()
+
 
 if __name__ == '__main__':
     unittest.main()

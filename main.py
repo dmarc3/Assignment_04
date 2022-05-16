@@ -194,6 +194,8 @@ def search_status(status_id, status_collection):
 def filter_status_by_string(search_word, status_collection):
     '''
     Searches statuses that contains the search word
+
+    Author: Kathleen Wong
     '''
     result = status_collection.filter_status_by_string(search_word)
     return result

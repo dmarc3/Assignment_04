@@ -16,7 +16,6 @@ db = pw.SqliteDatabase(FILE)
 db.connect()
 db.execute_sql('PRAGMA foreign_keys = ON;')
 
-
 class BaseModel(pw.Model):
     '''
     Define base model via PeeWee.Model
@@ -27,7 +26,6 @@ class BaseModel(pw.Model):
         Meta class for BaseModel
         '''
         database = db
-
 
 class Users(BaseModel):
     '''
@@ -45,7 +43,6 @@ class Users(BaseModel):
         constraints = [pw.Check('LENGTH(user_id) < 30'),
                        pw.Check('LENGTH(user_name) < 30'),
                        pw.Check('LENGTH(user_last_name) < 100')]
-
 
 class Status(BaseModel):
     '''

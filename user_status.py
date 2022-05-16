@@ -17,7 +17,7 @@ import peewee as pw
 import socialnetwork_model as sm
 
 
-class UserStatusCollection():
+class UserStatusCollection:
     '''
     Collection of UserStatus messages
     '''
@@ -85,6 +85,7 @@ class UserStatusCollection():
     def filter_status_by_string(self, search_word):
         '''
         Find and return status messages that contain a certain phrase
+        Author: Kathleen Wong
         '''
         try:
             status = self.database.select().where(self.database.status_text.contains(search_word)).iterator()

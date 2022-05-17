@@ -213,8 +213,6 @@ def search_all_status_updates(user_id: str, status_collection: user_status.UserS
         return result
     return None
 
-# New functions
-
 
 def load_collection(filename, keys, collection):
     '''
@@ -371,3 +369,4 @@ def validate_status_inputs(status_id, user_id, status_text):
         logging.error('Invalid status_text: %s', status_text)
         return False
     return True
+

@@ -112,5 +112,6 @@ class TestUserStatus(unittest.TestCase):
         test_db.drop_tables(MODELS)
         test_db.close()
 
+
 if __name__ == '__main__':
     unittest.main()

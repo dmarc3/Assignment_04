@@ -2,34 +2,33 @@
 main driver for a simple social network project
 
 Authors: Kathleen Wong and Marcus Bakke
-
-Disabled pylint error C0301 on method definition lines that are too
-long due to type hinting
 '''
 import csv
 import re
 import logging
-import typing
 import peewee as pw
 import users
 import user_status
 import socialnetwork_model as sm
 
-# Definte type hinting alias
-SearchUserResult = typing.Union[typing.Type[None], sm.Users]
-SearchStatusResult = typing.Union[typing.Type[None], sm.Status]
-DatabaseCollection = typing.Union[users.UserCollection, user_status.UserStatusCollection]
 
-# Users
-
-def init_user_collection() -> users.UserCollection:
+def init_user_collection():
     '''
     Creates and returns a new instance of UserCollection
     '''
     return users.UserCollection()
 
 
-def load_users(filename, user_collection: users.UserCollection) -> bool:
+def init_status_collection():
+    '''
+    Creates and returns a new instance of UserStatusCollection
+
+    Author: Marcus Bakke
+    '''
+    return user_status.UserStatusCollection()
+
+
+def load_users(filename, user_collection):
     '''
     Opens a CSV file with user data and
     adds it to an existing instance of
@@ -51,74 +50,7 @@ def load_users(filename, user_collection: users.UserCollection) -> bool:
     return load_collection(filename, keys, user_collection)
 
 
-def add_user(user_id: str, email: str, user_name: str, user_last_name: str, user_collection: users.UserCollection) -> bool: # pylint: disable=C0301
-    '''
-    Creates a new instance of User and stores it in user_collection
-    (which is an instance of UserCollection)
-
-    Requirements:
-    - user_id cannot already exist in user_collection.
-    - Returns False if there are any errors (for example, if
-      user_collection.add_user() returns False).
-    - Otherwise, it returns True.
-    '''
-    if not validate_user_inputs(user_id, email, user_name, user_last_name):
-        return False
-    return user_collection.add_user(user_id, email, user_name, user_last_name)
-
-
-def update_user(user_id: str, email: str, user_name: str, user_last_name: str, user_collection: users.UserCollection) -> bool: # pylint: disable=C0301
-    '''
-    Updates the values of an existing user
-
-    Requirements:
-    - Returns False if there any errors.
-    - Otherwise, it returns True.
-    '''
-    # Validate inputs
-    if not validate_user_inputs(user_id, email, user_name, user_last_name):
-        return False
-    return user_collection.modify_user(user_id, email, user_name, user_last_name)
-
-
-def delete_user(user_id: str, user_collection: users.UserCollection) -> bool:
-    '''
-    Deletes a user from user_collection.
-
-    Requirements:
-    - Returns False if there are any errors (such as user_id not found)
-    - Otherwise, it returns True.
-    '''
-    return user_collection.delete_user(user_id)
-
-
-def search_user(user_id: str, user_collection: users.UserCollection) -> SearchUserResult:
-    '''
-    Searches for a user in user_collection(which is an instance of
-    UserCollection).
-
-    Requirements:
-    - If the user is found, returns the corresponding User instance.
-    - Otherwise, it returns None.
-    '''
-    result = user_collection.search_user(user_id)
-    if result:
-        return result
-    return None
-
-
-# Status
-
-def init_status_collection() -> user_status.UserStatusCollection:
-    '''
-    Creates and returns a new instance of UserStatusCollection
-
-    Author: Marcus Bakke
-    '''
-    return user_status.UserStatusCollection()
-
-
-def load_status_updates(filename, status_collection: user_status.UserStatusCollection) -> bool:
+def load_status_updates(filename, status_collection):
     '''
     Opens a CSV file with status data and adds it to an existing
     instance of UserStatusCollection
@@ -138,7 +70,63 @@ def load_status_updates(filename, status_collection: user_status.UserStatusColle
     return load_collection(filename, keys, status_collection)
 
 
-def add_status(user_id: str, status_id: str, status_text: str, status_collection: user_status.UserStatusCollection) -> bool: # pylint: disable=C0301
+def add_user(user_id, email, user_name, user_last_name, user_collection):
+    '''
+    Creates a new instance of User and stores it in user_collection
+    (which is an instance of UserCollection)
+
+    Requirements:
+    - user_id cannot already exist in user_collection.
+    - Returns False if there are any errors (for example, if
+      user_collection.add_user() returns False).
+    - Otherwise, it returns True.
+    '''
+    if not validate_user_inputs(user_id, email, user_name, user_last_name):
+        return False
+    return user_collection.add_user(user_id, email, user_name, user_last_name)
+
+
+def update_user(user_id, email, user_name, user_last_name, user_collection):
+    '''
+    Updates the values of an existing user
+
+    Requirements:
+    - Returns False if there any errors.
+    - Otherwise, it returns True.
+    '''
+    # Validate inputs
+    if not validate_user_inputs(user_id, email, user_name, user_last_name):
+        return False
+    return user_collection.modify_user(user_id, email, user_name, user_last_name)
+
+
+def delete_user(user_id, user_collection):
+    '''
+    Deletes a user from user_collection.
+
+    Requirements:
+    - Returns False if there are any errors (such as user_id not found)
+    - Otherwise, it returns True.
+    '''
+    return user_collection.delete_user(user_id)
+
+
+def search_user(user_id, user_collection):
+    '''
+    Searches for a user in user_collection(which is an instance of
+    UserCollection).
+
+    Requirements:
+    - If the user is found, returns the corresponding User instance.
+    - Otherwise, it returns None.
+    '''
+    result = user_collection.search_user(user_id)
+    if result:
+        return result
+    return None
+
+
+def add_status(user_id, status_id, status_text, status_collection):
     '''
     Creates a new instance of UserStatus and stores it in
     user_collection(which is an instance of UserStatusCollection)
@@ -157,7 +145,7 @@ def add_status(user_id: str, status_id: str, status_text: str, status_collection
     return status_collection.add_status(status_id, user_id, status_text)
 
 
-def update_status(status_id: str, user_id: str, status_text: str, status_collection:user_status.UserStatusCollection) -> bool: # pylint: disable=C0301
+def update_status(status_id, user_id, status_text, status_collection):
     '''
     Updates the values of an existing status_id
 
@@ -173,7 +161,7 @@ def update_status(status_id: str, user_id: str, status_text: str, status_collect
     return status_collection.modify_status(status_id, user_id, status_text)
 
 
-def delete_status(status_id: str, status_collection: user_status.UserStatusCollection) -> bool:
+def delete_status(status_id, status_collection):
     '''
     Deletes a status_id from user_collection.
 
@@ -186,7 +174,7 @@ def delete_status(status_id: str, status_collection: user_status.UserStatusColle
     return status_collection.delete_status(status_id)
 
 
-def search_status(status_id: str, status_collection: user_status.UserStatusCollection) -> SearchStatusResult: # pylint: disable=C0301
+def search_status(status_id, status_collection):
     '''
     Searches for a status in status_collection
 
@@ -203,6 +191,16 @@ def search_status(status_id: str, status_collection: user_status.UserStatusColle
     return None
 
 
+def filter_status_by_string(search_word, status_collection):
+    '''
+    Searches statuses that contains the search word
+
+    Author: Kathleen Wong
+    '''
+    result = status_collection.filter_status_by_string(search_word)
+    return result
+
+
 def search_all_status_updates(user_id: str, status_collection: user_status.UserStatusCollection):
     '''
     Given user_id and StatusCollection,
@@ -215,9 +213,10 @@ def search_all_status_updates(user_id: str, status_collection: user_status.UserS
         return result
     return None
 
-# General Functions
+# New functions
 
-def load_collection(filename: str, keys: dict, collection: DatabaseCollection) -> bool:
+
+def load_collection(filename, keys, collection):
     '''
     Method which loads status or user collection from CSV file
 
@@ -268,7 +267,8 @@ def load_collection(filename: str, keys: dict, collection: DatabaseCollection) -
         logging.error('File does not exist: %s', filename)
         return False
 
-def validate_user_id(user_id: str) -> bool:
+
+def validate_user_id(user_id):
     '''
     Validates user_id
     '''
@@ -282,7 +282,8 @@ def validate_user_id(user_id: str) -> bool:
     except ValueError:
         return True
 
-def validate_email(email: str) -> bool:
+
+def validate_email(email):
     '''
     Validates email
     '''
@@ -293,7 +294,8 @@ def validate_email(email: str) -> bool:
         return False
     return True
 
-def validate_name(name: str) -> bool:
+
+def validate_name(name):
     '''
     Validates user_name
     '''
@@ -304,7 +306,8 @@ def validate_name(name: str) -> bool:
         return False
     return True
 
-def validate_status_id(status_id: str) -> bool:
+
+def validate_status_id(status_id):
     '''
     Validates status_id
     '''
@@ -323,7 +326,8 @@ def validate_status_id(status_id: str) -> bool:
     except ValueError:
         return False
 
-def validate_status_text(status_text: str) -> bool:
+
+def validate_status_text(status_text):
     '''
     Accept any text input
     '''
@@ -331,7 +335,8 @@ def validate_status_text(status_text: str) -> bool:
         return True
     return False
 
-def validate_user_inputs(user_id: str, email: str, user_name: str, user_last_name: str) -> bool:
+
+def validate_user_inputs(user_id, email, user_name, user_last_name):
     '''
     Validates all user inputs
     '''
@@ -350,7 +355,8 @@ def validate_user_inputs(user_id: str, email: str, user_name: str, user_last_nam
         return False
     return True
 
-def validate_status_inputs(status_id: str, user_id: str, status_text: str) -> bool:
+
+def validate_status_inputs(status_id, user_id, status_text):
     '''
     Validates all status inputs
     '''

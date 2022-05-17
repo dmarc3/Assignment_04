@@ -17,7 +17,7 @@ import peewee as pw
 import socialnetwork_model as sm
 
 
-class UserStatusCollection():
+class UserStatusCollection:
     '''
     Collection of UserStatus messages
     '''
@@ -26,7 +26,7 @@ class UserStatusCollection():
         logging.info('UserStatusCollection initialized.')
         self.database = sm.Status
 
-    def add_status(self, status_id: str, user_id: str, status_text: str) -> bool:
+    def add_status(self, status_id, user_id, status_text):
         '''
         add a new status message to the collection
         '''
@@ -41,7 +41,7 @@ class UserStatusCollection():
             logging.error('Unable to add %s.', status_id)
             return False
 
-    def modify_status(self, status_id: str, user_id: str, status_text: str) -> bool:
+    def modify_status(self, status_id, user_id, status_text):
         '''
         Modifies a status message
         '''
@@ -55,7 +55,7 @@ class UserStatusCollection():
             logging.error('Unable to modify %s.', status_id)
             return False
 
-    def delete_status(self, status_id: str) -> bool:
+    def delete_status(self, status_id):
         '''
         deletes the status message with id, status_id
         '''
@@ -68,7 +68,7 @@ class UserStatusCollection():
             logging.error('Unable to delete %s.', status_id)
             return False
 
-    def search_status(self, status_id: str):
+    def search_status(self, status_id):
         '''
         Find and return a status message by its status_id
 
@@ -93,3 +93,14 @@ class UserStatusCollection():
             return None
         logging.info("Found %i status' for %s.", len(query), user_id)
         return query
+
+    def filter_status_by_string(self, search_word):
+        '''
+        Find and return status messages that contain a certain phrase
+        Author: Kathleen Wong
+        '''
+        try:
+            status = self.database.select().where(self.database.status_text.contains(search_word)).iterator()
+            return status
+        except self.database.DoesNotExist:
+            logging.error('Unable to find %s', search_word)

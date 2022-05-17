@@ -7,7 +7,6 @@ Marcus incorporated all changes to user_status.py code.
 import sys
 import logging
 from datetime import datetime
-import peewee as pw
 import main
 
 # Build logger
@@ -23,7 +22,6 @@ logger.addHandler(file_handler)
 # Add launch statement
 logger.info('Session launched at %s.', datetime.today().strftime(':%H:%M:%S'))
 
-# User
 
 def load_users():
     '''
@@ -31,6 +29,14 @@ def load_users():
     '''
     filename = input('Enter filename of user file: ')
     main.load_users(filename, user_collection)
+
+
+def load_status_updates():
+    '''
+    Loads status updates from a file
+    '''
+    filename = input('Enter filename for status file: ')
+    main.load_status_updates(filename, status_collection)
 
 
 def add_user():
@@ -91,16 +97,6 @@ def delete_user():
         logging.info("User was successfully deleted")
 
 
-# Status
-
-def load_status_updates():
-    '''
-    Loads status updates from a file
-    '''
-    filename = input('Enter filename for status file: ')
-    main.load_status_updates(filename, status_collection)
-
-
 def add_status():
     '''
     Adds a new status into the database
@@ -141,6 +137,47 @@ def search_status():
         logging.info("Status text: %s", result.status_text)
 
 
+def filter_status_by_string():
+    '''
+    Filters statuses by phrases
+    '''
+    search_word = input('Enter the string to search: ')
+    result = main.filter_status_by_string(search_word, status_collection)
+    try:
+        while True:
+            next_result = next(result)
+            print(next_result.status_text)
+            yn_delete = input('Delete the status? (Y/N): ')
+            if yn_delete.lower().strip() == 'y':
+                delete_status(next_result.status_id, status_collection)
+            else:
+                yn_review = input('Review the next status? (Y/N): ')
+                if yn_review.lower().strip() == 'y':
+                    print(next(result).status_text)
+                else:
+                    break
+    except StopIteration:
+        logging.info('No more statuses with the following phrase %s', search_word)
+
+
+def search_all_status_updates_matching_a_string():
+    '''
+    Filters statuses by phrase
+    '''
+    search_word = input('Enter the string to search: ')
+    result = main.filter_status_by_string(search_word, status_collection)
+    for x in result:
+        print(x.status_text)
+
+
+def flagged_status_updates():
+    search_word = input('Enter the string to search: ')
+    result = main.filter_status_by_string(search_word, status_collection)
+    tuple_list = [(x.status_id, x.user_id, x.status_text) for x in result]
+    for x in tuple_list:
+        print(x)
+
+
 def delete_status():
     '''
     Deletes status from the database
@@ -152,7 +189,7 @@ def delete_status():
         logging.info("Status was successfully deleted")
 
 
-def status_generator(query: pw.ModelSelect):
+def status_generator(query):
     '''
     Status generator to return current status from query.
 
@@ -187,8 +224,6 @@ def search_all_status_updates():
         logging.info('You have reached the last status.')
 
 
-# General
-
 def validate_yes_no(ans: str) -> bool:
     '''
     Validates a yes or no response.
@@ -207,8 +242,6 @@ def quit_program():
     sys.exit()
 
 
-# Main
-
 if __name__ == '__main__':
     user_collection = main.init_user_collection()
     status_collection = main.init_status_collection()
@@ -224,7 +257,10 @@ if __name__ == '__main__':
         'I': search_status,
         'J': delete_status,
         'K': search_all_status_updates,
-        'L': quit_program
+        'L': filter_status_by_string,
+        'M': search_all_status_updates_matching_a_string,
+        'N': flagged_status_updates,
+        'O': quit_program
     }
     while True:
         user_selection = input("""
@@ -239,7 +275,10 @@ if __name__ == '__main__':
                             I: Search status
                             J: Delete status
                             K: Search user's status
-                            L: Quit
+                            L: Search status by phrase
+                            M: Search all status updates matching a string
+                            N: Search status by phrase as tuple
+                            O: Quit
 
                             Please enter your choice: """)
         user_selection = user_selection.upper().strip()

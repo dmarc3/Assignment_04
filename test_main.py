@@ -340,6 +340,14 @@ class TestMain(unittest.TestCase):
         for inp in inputs:
             self.assertFalse(main.validate_status_inputs(*inp))
 
+    def test_filter(self):
+        '''
+        Test filter_status_by_string method
+        Author: Kathleen Wong
+        '''
+        test = main.filter_status_by_string('test', self.status_collection)
+        self.assertTrue(test)
+
     def tearDown(self):
         '''
         Remove all tables at end of each test and close db.

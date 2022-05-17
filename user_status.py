@@ -82,6 +82,18 @@ class UserStatusCollection:
             logging.error('Unable to find %s.', status_id)
             return None
 
+    def search_all_status_updates(self, user_id: str):
+        '''
+        Given user_id, return all status updates for that user.
+        Return None if user_id not found.
+        '''
+        query = self.database.select().where(sm.Status.user_id == user_id)
+        if len(query) == 0:
+            logging.error('Unable to find %s.', user_id)
+            return None
+        logging.info("Found %i status' for %s.", len(query), user_id)
+        return query
+
     def filter_status_by_string(self, search_word):
         '''
         Find and return status messages that contain a certain phrase

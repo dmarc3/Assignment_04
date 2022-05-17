@@ -201,7 +201,17 @@ def filter_status_by_string(search_word, status_collection):
     return result
 
 
-# New functions
+def search_all_status_updates(user_id: str, status_collection: user_status.UserStatusCollection):
+    '''
+    Given user_id and StatusCollection,
+    return all status updates for that user.
+
+    Author: Marcus Bakke
+    '''
+    result = status_collection.search_all_status_updates(user_id)
+    if result:
+        return result
+    return None
 
 
 def load_collection(filename, keys, collection):

@@ -189,6 +189,51 @@ def delete_status():
         logging.info("Status was successfully deleted")
 
 
+def status_generator(query):
+    '''
+    Status generator to return current status from query.
+
+    StopIteration not needed here.
+    '''
+    for status in query:
+        yield status
+
+
+def search_all_status_updates():
+    '''
+    Ask for user_id, report how many status' were found and
+    ask user if they'd like to print each one
+    '''
+    user_id = input('Enter user ID to find status for: ')
+    query = main.search_all_status_updates(user_id, status_collection)
+    # If successful query, build and loop through generator
+    if query:
+        status_gen = status_generator(query)
+        for status in status_gen:
+            # Ask user for yes or no
+            question = 'Would you like to see the next status? (Y/N): '
+            ans = input(question)
+            while not validate_yes_no(ans):
+                ans = input(question)
+            # Interpret answer
+            if ans.lower() == 'y':
+                print(status.status_text)
+            else:
+                logging.info('Exiting search_all_status_updates.')
+                return
+        logging.info('You have reached the last status.')
+
+
+def validate_yes_no(ans: str) -> bool:
+    '''
+    Validates a yes or no response.
+    '''
+    if ans.lower() == 'y' or ans.lower() == 'n':
+        return True
+    print('Please enter a valid response.')
+    input('Press any key to continue...')
+    return False
+
 def quit_program():
     '''
     Quits program
@@ -210,11 +255,12 @@ if __name__ == '__main__':
         'G': add_status,
         'H': update_status,
         'I': search_status,
-        'J': filter_status_by_string,
-        'K': search_all_status_updates_matching_a_string,
-        'L': flagged_status_updates,
-        'M': delete_status,
-        'N': quit_program
+        'J': delete_status,
+        'K': search_all_status_updates,
+        'L': filter_status_by_string,
+        'M': search_all_status_updates_matching_a_string,
+        'N': flagged_status_updates,
+        'O': quit_program
     }
     while True:
         user_selection = input("""
@@ -227,11 +273,12 @@ if __name__ == '__main__':
                             G: Add status
                             H: Update status
                             I: Search status
-                            J: Search status by phrase
-                            K: Search all status updates matching a string
-                            L: Search status by phrase as tuple
-                            M: Delete status
-                            N: Quit
+                            J: Delete status
+                            K: Search user's status
+                            L: Search status by phrase
+                            M: Search all status updates matching a string
+                            N: Search status by phrase as tuple
+                            O: Quit
 
                             Please enter your choice: """)
         user_selection = user_selection.upper().strip()

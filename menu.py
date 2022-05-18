@@ -152,9 +152,7 @@ def filter_status_by_string():
                 delete_status_given(next_result.status_id)
             else:
                 yn_review = input('Review the next status? (Y/N): ')
-                if yn_review.lower().strip() == 'y':
-                    print(next(result).status_text)
-                else:
+                if yn_review.lower().strip() == 'n':
                     break
     except StopIteration:
         logging.info('No more statuses with the following phrase %s', search_word)

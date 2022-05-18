@@ -108,4 +108,3 @@ class UserStatusCollection:
         logging.info('Found %i results with %s', length, search_word)
         return self.database.select().where\
             (self.database.status_text.contains(search_word)).iterator()
-    

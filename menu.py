@@ -145,15 +145,13 @@ def filter_status_by_string():
     result = main.filter_status_by_string(search_word, status_collection)
     try:
         while True:
-            next_result = next(result)
-            print(next_result.status_text)
-            yn_delete = input('Delete the status? (Y/N): ')
-            if yn_delete.lower().strip() == 'y':
-                delete_status_given(next_result.status_id)
-            else:
-                yn_review = input('Review the next status? (Y/N): ')
-                if yn_review.lower().strip() == 'n':
-                    break
+            yn_review = input('Review the next status? (Y/N): ')
+            if yn_review.lower().strip() == 'y':
+                next_result = next(result)
+                print(next_result.status_text)
+                yn_delete = input('Delete the status? (Y/N): ')
+                if yn_delete.lower().strip() == 'y':
+                    delete_status_given(next_result.status_id)
     except StopIteration:
         logging.info('No more statuses with the following phrase %s', search_word)
 

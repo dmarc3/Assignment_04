@@ -100,11 +100,12 @@ class UserStatusCollection:
         Author: Kathleen Wong
         '''
         status = self.database.select().where\
-            (self.database.status_text.contains(search_word))
+            (self.database.status_text.contains(search_word)).iterator()
         length = len(list(status))
         if length == 0:
             logging.error('Unable to find %s', search_word)
             return None
+        logging.info('Found %i results with %s', length, search_word)
         return self.database.select().where\
             (self.database.status_text.contains(search_word)).iterator()
-
+    

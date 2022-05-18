@@ -149,7 +149,7 @@ def filter_status_by_string():
             print(next_result.status_text)
             yn_delete = input('Delete the status? (Y/N): ')
             if yn_delete.lower().strip() == 'y':
-                delete_status(next_result.status_id, status_collection)
+                delete_status_given(next_result.status_id)
             else:
                 yn_review = input('Review the next status? (Y/N): ')
                 if yn_review.lower().strip() == 'y':
@@ -166,16 +166,23 @@ def search_all_status_updates_matching_a_string():
     '''
     search_word = input('Enter the string to search: ')
     result = main.filter_status_by_string(search_word, status_collection)
-    for x in result:
-        print(x.status_text)
+    try:
+        for result_x in result:
+            print(result_x.status_text)
+    except TypeError:
+        logging.info('No statuses with the following phrase %s', search_word)
 
 
 def flagged_status_updates():
+    '''
+    Filter statuses for search word and turn results into tuples
+    '''
     search_word = input('Enter the string to search: ')
     result = main.filter_status_by_string(search_word, status_collection)
-    tuple_list = [(x.status_id, x.user_id, x.status_text) for x in result]
-    for x in tuple_list:
-        print(x)
+    try:
+        [print((x.status_id, x.user_id, x.status_text)) for x in result]
+    except TypeError:
+        logging.info('No statuses with the following phrase %s', search_word)
 
 
 def delete_status():
@@ -183,6 +190,16 @@ def delete_status():
     Deletes status from the database
     '''
     status_id = input('Status ID: ')
+    if not main.delete_status(status_id, status_collection):
+        logging.info("An error occurred while trying to delete status")
+    else:
+        logging.info("Status was successfully deleted")
+
+
+def delete_status_given(status_id):
+    '''
+    Deletes status from the database
+    '''
     if not main.delete_status(status_id, status_collection):
         logging.info("An error occurred while trying to delete status")
     else:
@@ -233,6 +250,7 @@ def validate_yes_no(ans: str) -> bool:
     print('Please enter a valid response.')
     input('Press any key to continue...')
     return False
+
 
 def quit_program():
     '''

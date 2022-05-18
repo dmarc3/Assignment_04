@@ -31,9 +31,9 @@ class UserStatusCollection:
         add a new status message to the collection
         '''
         try:
-            status = self.database.create(status_id = status_id,
-                                          user_id = user_id,
-                                          status_text = status_text)
+            status = self.database.create(status_id=status_id,
+                                          user_id=user_id,
+                                          status_text=status_text)
             status.save()
             logging.info('Added status %s by %s.', status_id, user_id)
             return True
@@ -99,8 +99,12 @@ class UserStatusCollection:
         Find and return status messages that contain a certain phrase
         Author: Kathleen Wong
         '''
-        try:
-            status = self.database.select().where(self.database.status_text.contains(search_word)).iterator()
-            return status
-        except self.database.DoesNotExist:
+        status = self.database.select().where\
+            (self.database.status_text.contains(search_word))
+        length = len(list(status))
+        if length == 0:
             logging.error('Unable to find %s', search_word)
+            return None
+        return self.database.select().where\
+            (self.database.status_text.contains(search_word)).iterator()
+
